@@ -10,20 +10,22 @@ console.log('Book Service URL:', BOOK_SERVICE_URL);
 
 /**
  * Transform book data for mobile clients
- * Replace "non-fiction" genre with "3"
+ * Replace "non-fiction" genre with numeric 3 (not string)
  */
 function transformBookData(book) {
   // Apply transformation if it's a single book object
   if (book && typeof book === 'object' && book.genre) {
     if (book.genre.toLowerCase() === 'non-fiction') {
-      book.genre = '3';
+      // Use number 3 instead of string '3'
+      book.genre = 3;
     }
   }
   // Process array of books
   else if (Array.isArray(book)) {
     book.forEach(item => {
       if (item.genre && item.genre.toLowerCase() === 'non-fiction') {
-        item.genre = '3';
+        // Use number 3 instead of string '3'
+        item.genre = 3;
       }
     });
   }
@@ -32,7 +34,7 @@ function transformBookData(book) {
 
 /**
  * Proxy all book requests to the Book Service
- * Transform the response for mobile clients
+ * Transform the response for mobile clients ONLY for GET requests
  */
 router.all('/*', async (req, res) => {
   try {
@@ -42,7 +44,6 @@ router.all('/*', async (req, res) => {
     
     console.log(`Forwarding ${req.method} request to: ${url}`);
     console.log('Request body:', req.body);
-    console.log('Request headers:', req.headers);
     
     // Forward the request to the Book Service
     const response = await axios({
@@ -56,11 +57,18 @@ router.all('/*', async (req, res) => {
     
     console.log('Response from Book Service:', response.status);
     
-    // Transform the response for mobile clients
-    const transformedData = transformBookData(response.data);
-    
-    // Send the transformed response back to the client
-    res.status(response.status).json(transformedData);
+    // Only transform GET responses, not PUT/POST/DELETE
+    if (req.method === 'GET') {
+      console.log('Transforming GET response for mobile client');
+      const transformedData = transformBookData(response.data);
+      // Log the transformed data for debugging
+      console.log('Transformed data:', JSON.stringify(transformedData, null, 2));
+      res.status(response.status).json(transformedData);
+    } else {
+      // For non-GET requests, return the original response
+      console.log('Passing through non-GET response');
+      res.status(response.status).json(response.data);
+    }
   } catch (error) {
     // Handle errors from the Book Service
     console.error('Error connecting to Book Service:', error.message);

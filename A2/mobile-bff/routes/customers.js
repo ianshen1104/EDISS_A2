@@ -31,7 +31,7 @@ function transformCustomerData(customer) {
 
 /**
  * Proxy all customer requests to the Customer Service
- * Transform the response for mobile clients
+ * Transform the response for mobile clients ONLY for GET requests
  */
 router.all('/*', async (req, res) => {
   try {
@@ -41,7 +41,6 @@ router.all('/*', async (req, res) => {
     
     console.log(`Forwarding ${req.method} request to: ${url}`);
     console.log('Request body:', req.body);
-    console.log('Request headers:', req.headers);
     
     // Forward the request to the Customer Service
     const response = await axios({
@@ -55,11 +54,16 @@ router.all('/*', async (req, res) => {
     
     console.log('Response from Customer Service:', response.status);
     
-    // Transform the response for mobile clients
-    const transformedData = transformCustomerData(response.data);
-    
-    // Send the transformed response back to the client
-    res.status(response.status).json(transformedData);
+    // Only transform GET responses, not PUT/POST/DELETE
+    if (req.method === 'GET') {
+      console.log('Transforming GET response for mobile client');
+      const transformedData = transformCustomerData(response.data);
+      res.status(response.status).json(transformedData);
+    } else {
+      // For non-GET requests, return the original response
+      console.log('Passing through non-GET response');
+      res.status(response.status).json(response.data);
+    }
   } catch (error) {
     // Handle errors from the Customer Service
     console.error('Error connecting to Customer Service:', error.message);
