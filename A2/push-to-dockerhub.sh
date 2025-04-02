@@ -18,23 +18,23 @@ docker login
 # Tag all images with Docker Hub username
 echo "Tagging images with $DOCKERHUB_USERNAME..."
 
-docker tag book-service:amd64 $DOCKERHUB_USERNAME/book-service:amd64
-docker tag customer-service:amd64 $DOCKERHUB_USERNAME/customer-service:amd64
-docker tag web-bff:amd64 $DOCKERHUB_USERNAME/web-bff:amd64
-docker tag mobile-bff:amd64 $DOCKERHUB_USERNAME/mobile-bff:amd64
+docker tag book-service:amd64-v2 $DOCKERHUB_USERNAME/book-service:amd64-v2
+docker tag customer-service:amd64-v2 $DOCKERHUB_USERNAME/customer-service:amd64-v2
+docker tag web-bff:amd64-v2 $DOCKERHUB_USERNAME/web-bff:amd64-v2
+docker tag mobile-bff:amd64-v2 $DOCKERHUB_USERNAME/mobile-bff:amd64-v2
 
 # Push all images to Docker Hub
 echo "Pushing images to Docker Hub..."
 
-docker push $DOCKERHUB_USERNAME/book-service:amd64
-docker push $DOCKERHUB_USERNAME/customer-service:amd64
-docker push $DOCKERHUB_USERNAME/web-bff:amd64
-docker push $DOCKERHUB_USERNAME/mobile-bff:amd64
+docker push $DOCKERHUB_USERNAME/book-service:amd64-v2
+docker push $DOCKERHUB_USERNAME/customer-service:amd64-v2
+docker push $DOCKERHUB_USERNAME/web-bff:amd64-v2
+docker push $DOCKERHUB_USERNAME/mobile-bff:amd64-v2
 
 echo "All images pushed to Docker Hub successfully!"
 echo ""
 echo "To pull these images on your EC2 instances, use:"
-echo "docker pull $DOCKERHUB_USERNAME/book-service:amd64"
-echo "docker pull $DOCKERHUB_USERNAME/customer-service:amd64"
-echo "docker pull $DOCKERHUB_USERNAME/web-bff:amd64" 
-echo "docker pull $DOCKERHUB_USERNAME/mobile-bff:amd64" 
+echo "docker pull $DOCKERHUB_USERNAME/book-service:amd64-v2"
+echo "docker pull $DOCKERHUB_USERNAME/customer-service:amd64-v2"
+echo "docker pull $DOCKERHUB_USERNAME/web-bff:amd64-v2" 
+echo "docker pull $DOCKERHUB_USERNAME/mobile-bff:amd64-v2" 

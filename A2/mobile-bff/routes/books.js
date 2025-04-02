@@ -5,6 +5,9 @@ const router = express.Router();
 // Get the Book Service URL from environment variables
 const BOOK_SERVICE_URL = process.env.BOOK_SERVICE_URL || 'http://localhost:3000';
 
+// Log the service URL for debugging
+console.log('Book Service URL:', BOOK_SERVICE_URL);
+
 /**
  * Transform book data for mobile clients
  * Replace "non-fiction" genre with "3"
@@ -33,15 +36,25 @@ function transformBookData(book) {
  */
 router.all('/*', async (req, res) => {
   try {
+    // Construct URL carefully to avoid double slashes
+    let targetPath = req.url === '/' ? '' : req.url;
+    const url = `${BOOK_SERVICE_URL}/books${targetPath}`;
+    
+    console.log(`Forwarding ${req.method} request to: ${url}`);
+    console.log('Request body:', req.body);
+    console.log('Request headers:', req.headers);
+    
     // Forward the request to the Book Service
     const response = await axios({
       method: req.method,
-      url: `${BOOK_SERVICE_URL}/books${req.url === '/' ? '' : req.url}`,
+      url: url,
       data: req.body,
       headers: {
         'Content-Type': 'application/json'
       }
     });
+    
+    console.log('Response from Book Service:', response.status);
     
     // Transform the response for mobile clients
     const transformedData = transformBookData(response.data);
@@ -50,7 +63,10 @@ router.all('/*', async (req, res) => {
     res.status(response.status).json(transformedData);
   } catch (error) {
     // Handle errors from the Book Service
+    console.error('Error connecting to Book Service:', error.message);
     if (error.response) {
+      console.error('Error response status:', error.response.status);
+      console.error('Error response data:', error.response.data);
       // Forward the error response
       res.status(error.response.status).json(error.response.data);
     } else {

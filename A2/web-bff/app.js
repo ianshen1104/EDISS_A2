@@ -16,6 +16,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoint - MUST be defined before the validation middleware
+app.get('/status', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Apply validation middleware to all routes except /status
 app.use((req, res, next) => {
   if (req.path === '/status') {
@@ -32,11 +37,6 @@ app.use((req, res, next) => {
 // Register routes
 app.use('/books', bookRoutes);
 app.use('/customers', customerRoutes);
-
-// Health check endpoint
-app.get('/status', (req, res) => {
-  res.status(200).send('OK');
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

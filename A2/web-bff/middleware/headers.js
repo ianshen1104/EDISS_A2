@@ -11,7 +11,9 @@ function validateClientType(req, res, next) {
     });
   }
   
-  if (clientType !== 'Web') {
+  // Make case-insensitive comparison and trim whitespace
+  const normalizedClientType = clientType.trim().toLowerCase();
+  if (normalizedClientType !== 'web') {
     return res.status(400).json({ 
       message: 'Invalid client type. Expected "Web"'
     });
