@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  book-service:
+    image: book-service
+    container_name: book-service
+    environment:
+      - DB_HOST=host.docker.internal
+      - DB_USER=root
+      - DB_PASSWORD=
+      - DB_NAME=bookstore
+      - DB_PORT=3306
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    networks:
+      - bookstore-network
+
+  customer-service:
+    image: customer-service
+    container_name: customer-service
+    environment:
+      - DB_HOST=host.docker.internal
+      - DB_USER=root
+      - DB_PASSWORD=
+      - DB_NAME=bookstore
+      - DB_PORT=3306
+      - PORT=3000
+    ports:
+      - "3001:3000"
+    networks:
+      - bookstore-network
+
+  web-bff:
+    image: web-bff
+    container_name: web-bff
+    environment:
+      - PORT=80
+      - BOOK_SERVICE_URL=http://book-service:3000
+      - CUSTOMER_SERVICE_URL=http://customer-service:3000
+      - JWT_SECRET=your-secret-key
+    ports:
+      - "8080:80"
+    depends_on:
+      - book-service
+      - customer-service
+    networks:
+      - bookstore-network
+
+  mobile-bff:
+    image: mobile-bff
+    container_name: mobile-bff
+    environment:
+      - PORT=80
+      - BOOK_SERVICE_URL=http://book-service:3000
+      - CUSTOMER_SERVICE_URL=http://customer-service:3000
+      - JWT_SECRET=your-secret-key
+    ports:
+      - "8081:80"
+    depends_on:
+      - book-service
+      - customer-service
+    networks:
+      - bookstore-network
+
+networks:
+  bookstore-network:
+    driver: bridge 
