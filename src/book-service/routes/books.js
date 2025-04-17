@@ -14,7 +14,7 @@ const isValidPrice = (price) => {
 };
 
 // Get the Recommendation Service URL from environment variables or use default
-const RECOMMENDATION_SERVICE_URL = process.env.RECOMMENDATION_SERVICE_URL || 'http://localhost:80';
+const RECOMMENDATION_SERVICE_URL = process.env.RECOMMENDATION_SERVICE_URL || 'http://3.130.6.49';
 
 /**
  * Create a new book
@@ -158,7 +158,7 @@ router.get('/:ISBN/related-books', async (req, res) => {
   try {
     // Make a request to the recommendation service
     try {
-      const response = await axios.get(`${RECOMMENDATION_SERVICE_URL}/recommendations/${ISBN}`);
+      const response = await axios.get(`${RECOMMENDATION_SERVICE_URL}/recommended-titles/isbn/${ISBN}`);
       
       // If there are related books, return them with 200 status
       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
