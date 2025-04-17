@@ -44,6 +44,22 @@ services:
     networks:
       - bookstore-network
 
+  crm-service:
+    image: crm-service
+    container_name: crm-service
+    environment:
+      - KAFKA_BROKERS=3.129.102.184:9092,18.118.230.221:9093,3.130.6.49:9094
+      - KAFKA_GROUP_ID=weiyuans-crm-service
+      - KAFKA_TOPIC=weiyuans.customer.evt
+      - EMAIL_USER=ediss.eiyuans@gmail.com
+      - EMAIL_APP_PASSWORD=dqri xjda tmsh kgaq
+      - EMAIL_FROM="Book Store <ediss.eiyuans@gmail.com>"
+      - PORT=3002
+    ports:
+      - "3002:3002"
+    networks:
+      - bookstore-network
+
   web-bff:
     image: web-bff
     container_name: web-bff

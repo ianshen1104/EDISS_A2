@@ -14,6 +14,7 @@ let isConnected = false;
 async function connectProducer() {
   if (!isConnected) {
     try {
+      console.log(`Attempting to connect to Kafka brokers: ${process.env.KAFKA_BROKERS}`);
       await producer.connect();
       isConnected = true;
       console.log('Connected to Kafka');
@@ -34,9 +35,13 @@ async function publishCustomerRegistered(customer) {
     // Ensure producer is connected
     await connectProducer();
     
+    const topic = 'weiyuans.customer.evt';
+    console.log(`Attempting to publish message to topic: ${topic}`);
+    console.log(`Message payload: ${JSON.stringify(customer)}`);
+    
     // Send the message
-    await producer.send({
-      topic: 'weiyuans.customer.evt',
+    const result = await producer.send({
+      topic: topic,
       messages: [
         { 
           value: JSON.stringify(customer) 
@@ -45,6 +50,7 @@ async function publishCustomerRegistered(customer) {
     });
     
     console.log(`Published customer registered event for: ${customer.userId}`);
+    console.log(`Kafka publish response: ${JSON.stringify(result)}`);
     return true;
   } catch (error) {
     console.error('Failed to publish customer registered event:', error);
