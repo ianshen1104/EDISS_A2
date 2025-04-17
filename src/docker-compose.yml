@@ -11,10 +11,22 @@ services:
       - DB_NAME=bookstore
       - DB_PORT=3306
       - PORT=3000
+      - RECOMMENDATION_SERVICE_URL=http://host.docker.internal:8082
     ports:
       - "3000:3000"
     networks:
       - bookstore-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Comment out the recommendation service since we're running it externally
+  # recommendation-service:
+  #   image: pmerson/book-recommendations-ms
+  #   container_name: recommendation-service
+  #   ports:
+  #     - "8082:8080"
+  #   networks:
+  #     - bookstore-network
 
   customer-service:
     image: customer-service
