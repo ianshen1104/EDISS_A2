@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../models/db');
+const { publishCustomerRegistered } = require('../utils/kafka');
 const router = express.Router();
 
 // Constants and validation helpers
@@ -62,22 +63,38 @@ router.post('/', async (req, res) => {
     );
 
     const customerId = result.insertId;
+    
+    // Prepare customer data for response and Kafka message
+    const customerData = {
+      id: customerId,
+      userId,
+      name,
+      phone,
+      address,
+      address2,
+      city,
+      state,
+      zipcode
+    };
+
+    // Publish customer registered event to Kafka
+    // We're doing this asynchronously without waiting for the result
+    // to avoid slowing down the API response
+    publishCustomerRegistered(customerData)
+      .then(success => {
+        if (!success) {
+          console.error('Failed to publish customer event to Kafka for userId:', userId);
+        }
+      })
+      .catch(error => {
+        console.error('Error when publishing to Kafka:', error);
+      });
 
     // Return success with Location header (required for Gradescope)
     res
       .status(201)
       .set('Location', `${req.protocol}://${req.get('host')}/customers/${customerId}`)
-      .json({
-        id: customerId,
-        userId,
-        name,
-        phone,
-        address,
-        address2,
-        city,
-        state,
-        zipcode
-      });
+      .json(customerData);
   } catch (error) {
     res.status(500).json({ message: 'Database error', error });
   }
